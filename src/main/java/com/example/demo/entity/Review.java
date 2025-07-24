@@ -1,98 +1,37 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
 @Entity
-@Table(name = "reviews")
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "canteen_id", nullable = false)
-    @NotBlank(message = "餐厅ID不能为空")
+    private String id;
     private String canteenId;
-
-    @Column(nullable = false)
-    @NotBlank(message = "用户名不能为空")
     private String username;
-
-    @Column(nullable = false)
-    @NotBlank(message = "昵称不能为空")
     private String nickname;
-
-    @Column(nullable = false)
-    @NotNull(message = "评分不能为空")
-    @DecimalMin(value = "1.0", message = "评分不能小于1")
-    @DecimalMax(value = "5.0", message = "评分不能大于5")
-    private Double rating;
-
-    @Column(columnDefinition = "TEXT")
-    @NotBlank(message = "评价内容不能为空")
+    private double rating;
     private String comment;
-
-    // 商家回复
-    @Column(columnDefinition = "TEXT")
+    private LocalDateTime createdAt;
     private String reply;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    // 构造函数
-    public Review() {}
-
-    public Review(String canteenId, String username, String nickname, Double rating, String comment) {
-        this.canteenId = canteenId;
-        this.username = username;
-        this.nickname = nickname;
-        this.rating = rating;
-        this.comment = comment;
-    }
-
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
+    // Getter/Setter 省略，为简洁可用 Lombok 或 IDE 自动生成
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getCanteenId() { return canteenId; }
     public void setCanteenId(String canteenId) { this.canteenId = canteenId; }
-
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
-
     public String getNickname() { return nickname; }
     public void setNickname(String nickname) { this.nickname = nickname; }
-
-    public Double getRating() { return rating; }
-    public void setRating(Double rating) { this.rating = rating; }
-
+    public double getRating() { return rating; }
+    public void setRating(double rating) { this.rating = rating; }
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }
-
-    public String getReply() { return reply; }
-    public void setReply(String reply) { this.reply = reply; }
-
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public String getReply() { return reply; }
+    public void setReply(String reply) { this.reply = reply; }
 }
