@@ -34,6 +34,10 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public Optional<User> findById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
     public User updateUser(User user) {
         return userRepository.save(user);
     }
