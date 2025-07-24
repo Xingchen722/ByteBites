@@ -1,6 +1,6 @@
 package com.example.demo.config;
 
-import com.example.demo.security.AuthTokenFilter;
+import com.example.demo.security.JwtAuthenticationFilter;
 import com.example.demo.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,8 +31,8 @@ public class WebSecurityConfig {
     UserDetailsServiceImpl userDetailsService;
 
     @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
+    public JwtAuthenticationFilter authenticationJwtTokenFilter() {
+        return new JwtAuthenticationFilter();
     }
 
     @Bean
