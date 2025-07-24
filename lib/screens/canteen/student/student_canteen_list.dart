@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:flutter_application_1/services/canteen_service.dart';
 
 class StudentCanteenList extends StatefulWidget {
   const StudentCanteenList({super.key});
@@ -130,7 +131,9 @@ class _StudentCanteenListState extends State<StudentCanteenList> {
     ),
   ];
 
-  List<Canteen> _filteredCanteens = [];
+  List<dynamic> canteens = [];
+  bool loading = true;
+  bool error = false;
   Position? _userPosition;
   String? _locationError;
   String _searchText = '';
@@ -140,9 +143,27 @@ class _StudentCanteenListState extends State<StudentCanteenList> {
   @override
   void initState() {
     super.initState();
-    _filteredCanteens = List.from(_allCanteens);
+    _loadCanteens();
     _loadFavorites();
     _getUserLocation();
+  }
+
+  Future<void> _loadCanteens() async {
+    setState(() { loading = true; error = false; });
+    try {
+      final data = await CanteenService.fetchCanteens();
+      setState(() {
+        canteens = data;
+        loading = false;
+      });
+    } catch (_) {
+      // 后端不可用时，回退到本地 mock 数据
+      setState(() {
+        canteens = _allCanteens.map((c) => c.toJson()).toList();
+        loading = false;
+        error = true;
+      });
+    }
   }
 
   Future<void> _loadFavorites() async {
@@ -247,7 +268,7 @@ class _StudentCanteenListState extends State<StudentCanteenList> {
       canteens.sort((a, b) => a.name.compareTo(b.name));
     }
     setState(() {
-      _filteredCanteens = canteens;
+      // _filteredCanteens = canteens; // This line is no longer needed as canteens is now the source
     });
   }
 
@@ -278,6 +299,12 @@ class _StudentCanteenListState extends State<StudentCanteenList> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    if (loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (canteens.isEmpty) {
+      return Center(child: Text(l10n.noCanteenFound));
+    }
     return Scaffold(
       body: Column(
         children: [
@@ -401,57 +428,55 @@ class _StudentCanteenListState extends State<StudentCanteenList> {
               child: Text(_locationError!, style: const TextStyle(color: Colors.red)),
             ),
           Expanded(
-            child: _filteredCanteens.isEmpty
-                ? Center(child: Text(l10n.noCanteenFound))
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _filteredCanteens.length,
-                    itemBuilder: (context, index) {
-                      final canteen = _filteredCanteens[index];
-                      return Stack(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: canteens.length,
+              itemBuilder: (context, index) {
+                final c = canteens[index];
+                return Stack(
+                  children: [
+                    StudentCanteenCard(
+                      canteen: c, // Pass the dynamic object
+                      titleWidget: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          StudentCanteenCard(
-                            canteen: canteen,
-                            titleWidget: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(canteen.name),
-                                queueIndicator(
-                                  _estimateQueue(
-                                    _userPosition == null
-                                        ? 0.0
-                                        : Geolocator.distanceBetween(
-                                            _userPosition!.latitude,
-                                            _userPosition!.longitude,
-                                            canteen.latitude,
-                                            canteen.longitude,
-                                          ),
-                                    DateTime.now(),
-                                    l10n,
-                                  ),
-                                  l10n,
-                                ),
-                              ],
+                          Text(c['name'] ?? ''),
+                          queueIndicator(
+                            _estimateQueue(
+                              _userPosition == null
+                                  ? 0.0
+                                  : Geolocator.distanceBetween(
+                                      _userPosition!.latitude,
+                                      _userPosition!.longitude,
+                                      c['latitude'] as double,
+                                      c['longitude'] as double,
+                                    ),
+                              DateTime.now(),
+                              l10n,
                             ),
-                          ),
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: IconButton(
-                              icon: Icon(
-                                _favoriteCanteenIds.contains(canteen.id)
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                color: _favoriteCanteenIds.contains(canteen.id) ? Colors.red : Colors.grey,
-                              ),
-                              onPressed: () => _toggleFavorite(canteen.id),
-                              tooltip: _favoriteCanteenIds.contains(canteen.id) ? l10n.cancel : l10n.add,
-                            ),
+                            l10n,
                           ),
                         ],
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: IconButton(
+                        icon: Icon(
+                          _favoriteCanteenIds.contains(c['id'] as String)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: _favoriteCanteenIds.contains(c['id'] as String) ? Colors.red : Colors.grey,
+                        ),
+                        onPressed: () => _toggleFavorite(c['id'] as String),
+                        tooltip: _favoriteCanteenIds.contains(c['id'] as String) ? l10n.cancel : l10n.add,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),
