@@ -18,14 +18,15 @@ class ByteBitesApp extends StatefulWidget {
 }
 
 class ByteBitesAppState extends State<ByteBitesApp> {
-  Locale _locale = const Locale('en');
+  Locale _locale = const Locale('en'); // 当前语言环境，默认为英文
 
   @override
   void initState() {
     super.initState();
-    _loadSavedLanguage();
+    _loadSavedLanguage(); // 初始化时加载已保存的语言设置
   }
 
+  // 从本地存储加载用户的语言偏好
   Future<void> _loadSavedLanguage() async {
     final prefs = await SharedPreferences.getInstance();
     final currentUsername = prefs.getString('currentUsername');
@@ -39,6 +40,7 @@ class ByteBitesAppState extends State<ByteBitesApp> {
     }
   }
 
+  // 切换语言
   void changeLanguage(Locale newLocale) {
     setState(() {
       _locale = newLocale;
@@ -49,8 +51,8 @@ class ByteBitesAppState extends State<ByteBitesApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ByteBites',
-      theme: ThemeData.dark(),
-      locale: _locale,
+      theme: ThemeData.dark(), // 使用暗色主题
+      locale: _locale, // 当前语言环境
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -58,19 +60,20 @@ class ByteBitesAppState extends State<ByteBitesApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en'), // English
-        Locale('zh'), // Chinese
+        Locale('en'), 
+        Locale('zh'), 
       ],
-      home: LoginScreen(),
+      home: LoginScreen(), // 默认首页为登录页
       routes: {
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/canteen_queue': (context) => CanteenQueuePage(),
+        '/login': (context) => const LoginScreen(), // 登录页路由
+        '/register': (context) => const RegisterScreen(), // 注册页路由
+        '/canteen_queue': (context) => CanteenQueuePage(), // 食堂排队页路由
       },
     );
   }
 }
 
+// 商家信息
 class Vendor {
   final String id;
   final String name;

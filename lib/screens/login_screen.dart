@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>(); // Add form key for validation
   File? _userAvatar;
 
+  // 登录验证方法
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -37,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String userType = 'student';
     String? avatarPath;
 
+    // 遍历用户列表验证登录信息
     for (String user in users) {
       List<String> userData = user.split('|');
       if (userData.length >= 3 &&
@@ -52,13 +54,14 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (loginSuccess) {
-      // Store current user's info separately for easy access
+      // 保存当前用户信息到本地
       await prefs.setString('currentUsername', _usernameController.text);
       await prefs.setString('currentUserType', userType);
       if (avatarPath != null) {
         await prefs.setString('currentUserAvatar', avatarPath);
       }
 
+      // 根据用户类型跳转到对应页面
       if (userType == 'student') {
         Navigator.pushReplacement(
           context,
@@ -86,7 +89,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Form(
-              // Wrap your form with Form widget
               key: _formKey,
               child: Column(
                 children: [
@@ -100,18 +102,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
+                  // 显示用户头像
                   if (_userAvatar != null)
                     CircleAvatar(
                       radius: 40,
                       backgroundImage: FileImage(_userAvatar!),
                     ),
                   const SizedBox(height: 20),
+                  // 用户名输入框
                   TextFormField(
-                    // Changed from TextField to TextFormField
                     controller: _usernameController,
                     style: const TextStyle(color: Colors.white),
                     validator: (value) {
-                      // Add validation
+                      // 用户名验证
                       if (value == null || value.isEmpty) {
                         return 'Please enter username';
                       }
@@ -127,13 +130,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // 密码输入框
                   TextFormField(
-                    // Changed from TextField to TextFormField
                     controller: _passwordController,
                     style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
                     obscureText: true,
                     validator: (value) {
-                      // Add validation
+                      // 密码验证
                       if (value == null || value.isEmpty) {
                         return 'Please enter password';
                       }
@@ -149,6 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
+                  // 登录按钮行
                   Row(
                     children: [
                       Image.asset('assets/images/spongebob.png', height: 48),
@@ -165,6 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
+                  // 注册按钮行
                   Row(
                     children: [
                       Expanded(

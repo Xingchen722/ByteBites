@@ -19,7 +19,7 @@ class CanteenPage extends StatelessWidget {
             icon: Icon(Icons.queue),
             label: Text('食堂排队情况估算'),
             onPressed: () {
-              Navigator.pushNamed(context, '/canteen_queue');
+              Navigator.pushNamed(context, '/canteen_queue'); // 跳转食堂排队页面
             },
           ),
         ],
@@ -28,7 +28,7 @@ class CanteenPage extends StatelessWidget {
   }
 }
 
-// 这里是用户资料页示例
+// 用户资料页
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -38,6 +38,7 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+// 探索页，展示匹配用户
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
 
@@ -46,13 +47,13 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
-  List<Map<String, dynamic>> _matchingUsers = [];
-  bool _isLoading = true;
+  List<Map<String, dynamic>> _matchingUsers = []; // 匹配到的用户列表
+  bool _isLoading = true; 
 
   @override
   void initState() {
     super.initState();
-    _loadMatchingUsers();
+    _loadMatchingUsers(); // 初始化时加载匹配用户
   }
 
   Future<void> _loadMatchingUsers() async {

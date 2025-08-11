@@ -1,8 +1,10 @@
+// 引入Flutter相关包和本地化、存储、随机数
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 
+// 互动页面，包含转盘、骰子、聊天室、猜数字等功能
 class FunInteractionScreen extends StatefulWidget {
   const FunInteractionScreen({super.key});
 
@@ -12,20 +14,21 @@ class FunInteractionScreen extends StatefulWidget {
 
 class _FunInteractionScreenState extends State<FunInteractionScreen>
     with TickerProviderStateMixin {
+  // 动画控制器
   late AnimationController _wheelController;
   late AnimationController _diceController;
   late Animation<double> _wheelAnimation;
   late Animation<double> _diceAnimation;
   
-  double _wheelAngle = 0.0;
-  int _diceNumber = 1;
-  bool _isSpinning = false;
-  bool _isRolling = false;
+  double _wheelAngle = 0.0; // 转盘当前角度
+  int _diceNumber = 1; // 骰子当前点数
+  bool _isSpinning = false; // 是否正在转动
+  bool _isRolling = false; // 是否正在掷骰子
   
-  String _selectedMode = 'wheel'; // 'wheel' or 'dice'
-  String _selectedType = 'custom'; // 'custom' or 'default'
+  String _selectedMode = 'wheel'; // 当前模式：转盘或骰子
+  String _selectedType = 'custom'; // 当前类型：自定义或默认
   
-  List<String> _customFoods = [];
+  List<String> _customFoods = []; // 用户自定义食物列表
   List<String> _defaultFoods = [
     'Chicken Rice',
     'Nasi Lemak',
@@ -58,8 +61,9 @@ class _FunInteractionScreenState extends State<FunInteractionScreen>
   // 1. 聊天室相关状态
   List<Map<String, String>> _chatMessages = [];
   final TextEditingController _chatController = TextEditingController();
-  bool _showChatRoom = false;
+  bool _showChatRoom = false; // 是否显示聊天室
 
+  // 加载聊天室消息
   Future<void> _loadChatMessages() async {
     final prefs = await SharedPreferences.getInstance();
     final list = prefs.getStringList('fun_chat_messages') ?? [];
@@ -71,6 +75,7 @@ class _FunInteractionScreenState extends State<FunInteractionScreen>
     });
   }
 
+  // 保存聊天室消息
   Future<void> _saveChatMessages() async {
     final prefs = await SharedPreferences.getInstance();
     final list = _chatMessages.map((e) => '${e['user']}|:|${e['msg']}').toList();
@@ -78,12 +83,13 @@ class _FunInteractionScreenState extends State<FunInteractionScreen>
   }
 
   // 猜数字小游戏相关状态
-  bool _showGuessNumber = false;
-  int _targetNumber = 0;
-  int _guessCount = 0;
-  String _guessFeedback = '';
+  bool _showGuessNumber = false; // 是否显示猜数字游戏
+  int _targetNumber = 0; // 目标数字
+  int _guessCount = 0; // 猜测次数
+  String _guessFeedback = ''; // 猜测反馈
   final TextEditingController _guessController = TextEditingController();
 
+  // 开始猜数字游戏
   void _startGuessNumberGame() {
     setState(() {
       _targetNumber = 1 + Random().nextInt(100);
@@ -94,6 +100,7 @@ class _FunInteractionScreenState extends State<FunInteractionScreen>
     });
   }
 
+  // 提交猜测
   void _submitGuess(String lang) {
     final guess = int.tryParse(_guessController.text.trim());
     if (guess == null) {
